@@ -72,7 +72,3 @@ for index = 1:size(M,2)
     disp("AMAP: " + string(rmse_amap(index)))
     disp("SBL: " + string(rmse_sbl(index)))
 end
-
-figure, plot(M, rmse_ista, 'g-x', M, rmse_sbl, 'b--o', M, rmse_amap, 'r:*');
-title("Rmse vs M")
-legend("Ista", "SBL", "AMAP", 'Location', 'best');
