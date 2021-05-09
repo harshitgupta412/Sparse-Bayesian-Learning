@@ -1,14 +1,12 @@
 % experiment to compare reconstructions for varying sparsity.
-% y = Ax + noise. entries in x is sampled from uniform distribution U(0,1)
-% noise variance is 0.5 and A is a random normal matrix od size 50x100. For each sparsity level, the experiment is
+% y = x + noise. entries in x is sampled from uniform distribution U(0,1)
+% noise variance is 0.1. For each sparsity level, the experiment is
 % performed 100 times and averaged.
 rng(0);
 % sparsity levels
-K = [10, 15, 20, 25, 30, 40, 50];
+K = [10, 15, 20, 25, 30];
 % sparse vector size
 total_entry = 100;
-%the matrix A
-A = randn(50,total_entry);
 % rmse values
 rmse_ista = zeros(size(K));
 rmse_amap = zeros(size(K));
@@ -31,37 +29,41 @@ for index = 1:size(K,2)
         x(indices) = numbers;
 
         % measurements 
-        y = A*x + 0.5*randn(size(A, 1),1);
+        y = x + 0.1*randn(size(x));
+
+        %the matrix A will correspond to Identity
+        A = eye(size(x,1));
+
         % constants for ista algorithm
         Nmax = 100; % number of iterations
         lambda = 1; % regulariser
 
         % constants for omp, amap, sbl
-        sigma = 0.5; % noise standard deviation.
-        eps = sigma; % run until ||y-Phi x|| < eps. For gaussian noise, eps = sigma suffices
+        sigma = 0.1; % noise standard deviation.
+        eps = sigma; % run until ||y-Phi x|| < eps. For gaussian noise, eps = 3*sigma suffices
 
         % reconstructions
         [tist,telap] = ista(y, A, lambda, Nmax);
         time_ista(index) = time_ista(index) + telap;
-        [tsbl, telap] = sbl(y, A,  sigma, eps, 0);
+        [tsbl, telap] = sbl(y, A,  sigma, eps);
         time_sbl(index) = time_sbl(index) + telap;
-        [tomp, telap] = omp(y, A, eps, 0);
+        [tomp, telap] = omp(y, A, eps);
         time_omp(index) = time_omp(index) + telap;
-        [tamap, telap] = amap(y, A,  sigma, eps, 0);
+        [tamap, telap] = amap(y, A,  sigma, eps);
         time_amap(index) = time_amap(index) + telap;
             
         % rmse
-        rmse_omp(index) = rmse_omp(index) + norm(tomp(:) - x(:));
-        rmse_ista(index) = rmse_ista(index) + norm(tist(:) - x(:));
-        rmse_amap(index) = rmse_amap(index) + norm(tamap(:) - x(:));
-        rmse_sbl(index) = rmse_sbl(index) + norm(tsbl(:) - x(:));
+        rmse_omp(index) = rmse_omp(index) + norm(tomp(:) - x(:))/norm(x(:));
+        rmse_ista(index) = rmse_ista(index) + norm(tist(:) - x(:))/norm(x(:));
+        rmse_amap(index) = rmse_amap(index) + norm(tamap(:) - x(:))/norm(x(:));
+        rmse_sbl(index) = rmse_sbl(index) + norm(tsbl(:) - x(:))/norm(x(:));
     end
     rmse_omp(index) = rmse_omp(index)/100;
     rmse_ista(index) = rmse_ista(index)/100;
     rmse_sbl(index) = rmse_sbl(index)/100;
     rmse_amap(index) = rmse_amap(index)/100;
     
-    disp("mse for k =" + string(k) + " is ");
+    disp("Rmse for k =" + string(k) + " is ");
     disp("OMP: " + string(rmse_omp(index)))
     disp("ISTA: " + string(rmse_ista(index)))
     disp("AMAP: " + string(rmse_amap(index)))
@@ -70,7 +72,7 @@ end
 
 % plotting the rmse values
 figure, plot(K/total_entry, rmse_ista, 'g-x', K/total_entry, rmse_sbl, 'b--o', K/total_entry, rmse_amap, 'r:*', K/total_entry, rmse_omp, 'k-.+');
-title("mse vs Sparsity(number of non zero entries/total entries)")
+title("Rmse vs Sparsity(number of non zero entries/total entries)")
 legend("Ista", "SBL", "AMAP", "OMP", 'Location', 'best');
 
 % plotting the time values

@@ -22,7 +22,7 @@ lambda = 1; % regulariser
 
 % constants for omp, amap, sbl
 eps = 0.01; % run until ||y-Phi x|| < eps
-sigma = 0.01; % noise variance
+sigma = 0.01; % noise standard deviation
 
 for index = 1:size(M,2)
     % Number of measurements
@@ -50,14 +50,14 @@ for index = 1:size(M,2)
             [tist,telap] = ista(yi, A, lambda, Nmax);
             time_ista(index) = time_ista(index) + telap;
             
-            [tsbl, telap] = sbl(yi, A,  sigma, eps);
+            [tsbl, telap] = sbl(yi, A,  sigma, eps,0);
             time_sbl(index) = time_sbl(index) + telap;
             
             
             if m < 64 % for m=64, the matrix is not invertible in amap. For omp it takes a lot of time
-               [tomp, telap] = omp(yi, A, eps);
+               [tomp, telap] = omp(yi, A, eps,0);
                 time_omp(index) = time_omp(index) + telap;
-                [tamap, telap] = amap(yi, A,  sigma, eps);
+                [tamap, telap] = amap(yi, A,  sigma, eps,0);
                 time_amap(index) = time_amap(index) + telap;
             end
             
