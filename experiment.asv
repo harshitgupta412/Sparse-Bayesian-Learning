@@ -53,10 +53,10 @@ for index = 1:size(M,2)
             [tsbl, telap] = sbl(yi, A,  sigma, eps);
             time_sbl(index) = time_sbl(index) + telap;
             
-            [tomp, telap] = omp(yi, A, eps);
-            time_omp(index) = time_omp(index) + telap;
             
-            if m < 64 % for m=64, the matrix is not invertible
+            if m < 64 % for m=64, the matrix is not invertible in amap. For omp it takes a lot of time
+               [tomp, telap] = omp(yi, A, eps);
+                time_omp(index) = time_omp(index) + telap;
                 [tamap, telap] = amap(yi, A,  sigma, eps);
                 time_amap(index) = time_amap(index) + telap;
             end
@@ -107,4 +107,4 @@ figure, plot(M, rmse_ista, 'g-x', M, rmse_sbl, 'b--o', M, rmse_amap, 'r:*', M, r
 title("Rmse vs M")
 legend("Ista", "SBL", "AMAP", "OMP", 'Location', 'best');
 
-save('barbara', 'rmse_amap', 'rmse_ista', 'rmse_omp
+save('barbara', 'rmse_amap', 'rmse_ista', 'rmse_omp', 'rmse_sbl', 'time_amap', 'time_ista', 'time_omp', 'time_sbl')

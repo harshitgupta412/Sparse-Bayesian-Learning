@@ -53,10 +53,10 @@ for index = 1:size(M,2)
             [tsbl, telap] = sbl(yi, A,  sigma, eps);
             time_sbl(index) = time_sbl(index) + telap;
             
-            [tomp, telap] = omp(yi, A, eps);
-            time_omp(index) = time_omp(index) + telap;
             
-            if m < 64 % for m=64, the matrix is not invertible
+            if m < 64 % for m=64, the matrix is not invertible in amap. For omp it takes a lot of time
+               [tomp, telap] = omp(yi, A, eps);
+                time_omp(index) = time_omp(index) + telap;
                 [tamap, telap] = amap(yi, A,  sigma, eps);
                 time_amap(index) = time_amap(index) + telap;
             end
